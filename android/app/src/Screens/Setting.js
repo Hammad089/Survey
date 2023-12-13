@@ -1,5 +1,5 @@
 import { View, StyleSheet, Image, Text, TextInput, Button, TouchableOpacity, Alert } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { Box, Heading, Menu, AspectRatio, Center, HStack, Stack, NativeBaseProvider, Pressable } from "native-base";
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import ProjectIcon from 'react-native-vector-icons/Octicons'
@@ -14,7 +14,32 @@ export default function Setting({ navigation }) {
   const [oldPassword, setOldPassword] = useState('');
   const [new_password, setNewPassword] = useState('');
   const [updatePassword, setUpdatePassword] = useState('')
+  const [data, setData] = useState({})
   const toast = useToast();
+  // profile api
+  const apiURL = 'https://coralr.com/api/profile';
+  const fetchProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        const response = await axios.post(apiURL, {}, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        console.log('API Response', response.data)
+        setData(response.data.data);
+        console.log(response.data.data.name)
+           
+      }
+    } catch (error) {
+      console.log('API Response Error', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
   ////logout api
   const LogoutapiURL = 'https://coralr.com/api/logout';
   const LogoutHandling = async () => {
@@ -133,8 +158,8 @@ export default function Setting({ navigation }) {
               <Box>
                 <Menu trigger={triggerProps => {
                   return <Pressable accessibilityLabel="More options menu" {...triggerProps}>
-                    <Image source={require('../Assests/avatar.jpg')} style={{ width: 35, height: 35, borderRadius: 50, backgroundColor: '#1e76ba' }} />
-                  </Pressable>;
+                  <Image source={{ uri: `https://coralr.com/${data.image}` }} style={{ width: 35, height: 35, borderRadius: 50, backgroundColor: '#1e76ba' }} />
+                 </Pressable>;
                 }}>
                   <Menu.Item onPress={() => navigation.navigate('Profile')}>
                     <ProfileIcon name='user' size={20} />
@@ -156,7 +181,7 @@ export default function Setting({ navigation }) {
         <View style={style.container}>
           <View style={style.formContainer}>
             <View style={style.formContent}>
-              <Image source={require('../Assests/avatar.jpg')} style={style.IconAvatar} />
+            <Image source={{ uri: `https://coralr.com/${data.image}` }} style={style.IconAvatar} />
               <Text style={style.Label}>Old Password</Text>
               <TextInput
                 style={style.input}
