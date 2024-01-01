@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Button, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Button, ScrollView, Image, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import LocationIcon from 'react-native-vector-icons/Ionicons'
 import { Box, Heading, Menu, AspectRatio, Center, HStack, Stack, NativeBaseProvider, Pressable } from "native-base";
@@ -28,7 +28,7 @@ export default function Circle({ navigation }) {
         console.log('API Response', response.data)
         setData(response.data.data);
         console.log(response.data.data.name)
-           
+
       }
     } catch (error) {
       console.log('API Response Error', error);
@@ -42,8 +42,8 @@ export default function Circle({ navigation }) {
   console.log('assignmentID in circle', asignmentID);
   const itemId = route.params?.ItemId;
   const assignment_modified_id = route.params?.AssignmentModifiedID;
-  console.log(assignment_modified_id)
-  console.log(itemId);
+  console.log('assignment modified', assignment_modified_id)
+  console.log('task id in circle', itemId);
   ////
   const assignment_circleApiURL = `https://coralr.com/api/assignment-circles?assignment_id=${asignmentID}&task_id=${itemId}`;
 
@@ -81,7 +81,7 @@ export default function Circle({ navigation }) {
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('Token received in Dashboard logout functionality', token);
-  
+
       if (token) {
         const response = await axios.post(
           LogoutapiURL,
@@ -92,9 +92,9 @@ export default function Circle({ navigation }) {
             }
           }
         );
-  
+
         console.log(response.data);
-  
+
         if (response.data.status === 'success') {
           await AsyncStorage.removeItem('token');
           console.log('Logout successful');
@@ -139,12 +139,11 @@ export default function Circle({ navigation }) {
             <View>
               <Text style={{ fontSize: 18, color: 'white', fontWeight: '700' }}>{assignment_moodifiedID}</Text>
             </View>
-
             <View>
               <Box>
                 <Menu trigger={triggerProps => {
                   return <Pressable accessibilityLabel="More options menu" {...triggerProps}>
-                    <Image source={{uri: `https://coralr.com/${data.image}`}} style={{ width: 35, height: 35, borderRadius: 50, backgroundColor: '#1e76ba' }} />
+                    <Image source={{ uri: `https://coralr.com/${data.image}` }} style={{ width: 35, height: 35, borderRadius: 50, backgroundColor: '#1e76ba' }} />
                   </Pressable>;
                 }}>
                   <Menu.Item onPress={() => navigation.navigate('Profile')}>
@@ -165,11 +164,11 @@ export default function Circle({ navigation }) {
         </NativeBaseProvider>
       </View>
       {
-        assignmentCircle.map((item, index) => {
+        assignmentCircle && assignmentCircle.length > 0 ? (assignmentCircle.map((item, index) => {
           return (
-              <>
+            <>
               <View style={styles.Cards} key={item.id}>
-                <TouchableOpacity onPress={() => navigation.navigate('Circle-104', { itemID: itemId, asignmentID:asignmentID, assignment_moodifiedID:assignment_moodifiedID })}>
+                <TouchableOpacity onPress={() => navigation.navigate('Circle-104', { itemID: itemId, asignmentID: asignmentID, assignment_moodifiedID: assignment_moodifiedID })}>
                   <Text style={{ fontSize: 20, color: '#87CEEB', fontWeight: '600' }}>{item.location_type}</Text>
                 </TouchableOpacity>
                 <View>
@@ -209,6 +208,11 @@ export default function Circle({ navigation }) {
             </>
           )
         })
+        ) : (
+          <>
+            <ActivityIndicator size="large" style={{ marginTop: 200, alignSelf: 'center' }} />
+          </>
+        )
       }
 
     </>

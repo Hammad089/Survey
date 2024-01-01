@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity, Button, Alert,ScrollView,RefreshControl } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, Button, Alert,ScrollView,RefreshControl,ActivityIndicator } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { collection, getDocs, doc, deleteDoc, } from 'firebase/firestore';
 import { db } from "../../../../firebase/config";
@@ -8,8 +8,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import RBSheet from "react-native-raw-bottom-sheet";
 export default function Draft({ navigation, route }) {
     const RBSheetRef = useRef();
-    const { itemID, province, city, tehsil, district, districtCode, locationName, tehsilCode, chargeCode, assignment_moodifiedID } = route.params;
-    console.log('data from circle 104', province, city, tehsil, district, districtCode, locationName, chargeCode, assignment_moodifiedID);
+    const { itemID, province, city, tehsil, district, districtCode, locationName, tehsilCode, chargeCode, assignment_moodifiedID,AssignID,latitude,longitude } = route.params;
+    console.log('data from circle 104', province, city, tehsil, district, districtCode, locationName, chargeCode, assignment_moodifiedID,AssignID,latitude,longitude);
     const config = {
         dependencies: {
             'linear-gradient': LinearGradient
@@ -76,7 +76,7 @@ export default function Draft({ navigation, route }) {
         ShowAlert();
     }
 
-    const renderQuestionAndAnswer = (selectedShopType, selectedOutletData) => {
+    const renderQuestionAndAnswer = (selectedShopType, selectedOutletData,) => {
         let questionIndex = null;
 
         switch (selectedShopType) {
@@ -92,6 +92,25 @@ export default function Draft({ navigation, route }) {
             default:
                 break;
         }
+        if (selectedOutletData.groupValues) {
+            switch (selectedOutletData.groupValues) {
+                case 'Shoes and footwear':
+                    questionIndex = 0;
+                    break;
+                case 'Clothing':
+                    questionIndex = 1;
+                    break;
+                case 'Food':
+                    questionIndex = 2;
+                    break;
+                case 'Art':
+                    questionIndex = 3;
+                    break;
+                default:
+                    break;
+            }
+        }
+       
         if (questionIndex !== null) {
             return (
                 <>
@@ -127,7 +146,14 @@ export default function Draft({ navigation, route }) {
                         <Text style={{ fontSize: 14, fontWeight: '700' }}>Question</Text>
                         <Text style={{ fontSize: 14, fontWeight: '700' }}>{selectedOutletData.Questions[2]?.label_text}</Text>
                     </View>
-                    <Text>Answer: {selectedOutletData.SelectedShopType}</Text>
+                    {
+                        selectedOutletData.SelectedShopType === null ? (
+                            <Text>Answer: {selectedOutletData.groupValues}</Text>
+                        ): (
+                            <Text>Answer: {selectedOutletData.SelectedShopType}</Text>
+                        )
+                    }
+
                     {
                         renderQuestionAndAnswer(selectedOutletData.SelectedShopType, selectedOutletData)
                     }
@@ -166,7 +192,7 @@ export default function Draft({ navigation, route }) {
 
                 </View>
                 {
-                    formData.map((item, index) => (
+                  formData.length > 0 ? (formData.map((item, index) => (
                         <View style={styles.tableRow} key={index}>
                             <Text style={styles.tableCell}>{item.Answer[0]}</Text>
                             <TouchableOpacity>
@@ -216,11 +242,14 @@ export default function Draft({ navigation, route }) {
                             </RBSheet>
                         </View>
                     ))
+                  ):(
+                    <ActivityIndicator size="large" style={{marginTop:200, alignSelf:'center'}} />
+                  )
                 }
                 </ScrollView>
             </View>
             <View>
-                <Button title="Start New Survey" color='#39b24a' onPress={() => navigation.navigate('Survey', { itemId: itemID, Province: province, City: city, District: district, Tehsil: tehsil, DistrictCode: districtCode, LocationName: locationName, TehsilCode: tehsilCode, Chargecode: chargeCode, assignment_moodifiedID: assignment_moodifiedID })} />
+                <Button title="Start New Survey" color='#39b24a' onPress={() => navigation.navigate('Survey', { itemId: itemID, Province: province, City: city, District: district, Tehsil: tehsil, DistrictCode: districtCode, LocationName: locationName, TehsilCode: tehsilCode, Chargecode: chargeCode, assignment_moodifiedID: assignment_moodifiedID,latitude:latitude,longitude:longitude, AssignID:AssignID})} />
             </View>
         </>
     );

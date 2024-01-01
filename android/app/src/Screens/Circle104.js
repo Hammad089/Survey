@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Button, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Button, ScrollView, Image,ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import LocationIcon from 'react-native-vector-icons/Ionicons'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -26,6 +26,8 @@ export default function Circle104({ navigation }) {
   const [locationName, setLocationName] = useState(null);
   const [tehsilCode, setTehsilCode] = useState(null);
   const [chargeCode, setChargeCode] = useState(null);
+  const [latitude,setLatitude] = useState(null);
+  const [longitude,setLongitude] = useState(null);
   const [data, setData] = useState({})
   const route = useRoute();
   const apiURL = 'https://coralr.com/api/profile';
@@ -55,6 +57,7 @@ export default function Circle104({ navigation }) {
   const assignmentID = route.params?.asignmentID;
   console.log('assignmentID in circle 104', assignmentID)
   console.log('item id in circle 104', itemID);
+
   //////////
   const assignment_circleApiURL = `https://coralr.com/api/assignment-circles?assignment_id=${assignmentID}&task_id=${itemID}`;
   const fetchAssignmentCircle = async () => {
@@ -84,7 +87,10 @@ export default function Circle104({ navigation }) {
           setLocationName(firstCircle.location_name)
           setTehsilCode(firstCircle.tehsil_code)
           setChargeCode(firstCircle.charge_code);
-          navigation.navigate('Draft', { itemID: itemID, province: firstCircle.province, city: firstCircle.city, tehsil: firstCircle.tehsil, district:firstCircle.district, districtCode:firstCircle.district_code, locationName:firstCircle.location_name, tehsilCode:firstCircle.tehsil_code, chargeCode:firstCircle.charge_code,});
+          setLatitude(firstCircle.lat);
+          setLongitude(firstCircle.lng)
+          navigation.navigate('Draft', { itemID: itemID, province: firstCircle.province, city: firstCircle.city, tehsil: firstCircle.tehsil, district:firstCircle.district, districtCode:firstCircle.district_code, locationName:firstCircle.location_name, tehsilCode:firstCircle.tehsil_code, chargeCode:firstCircle.charge_code,AssignID:assignmentID,latitude:firstCircle.lat,longitude:firstCircle.lng});
+          navigation.navigate('Published', { itemID: itemID, province: firstCircle.province, city: firstCircle.city, tehsil: firstCircle.tehsil, district:firstCircle.district, districtCode:firstCircle.district_code, locationName:firstCircle.location_name, tehsilCode:firstCircle.tehsil_code, chargeCode:firstCircle.charge_code,AssignID:assignmentID,latitude:firstCircle.lat,longitude:firstCircle.lng});
         }
       } catch (error) {
         console.log('ERROR in cicle Assignment API', error.message)
@@ -183,7 +189,7 @@ export default function Circle104({ navigation }) {
         </NativeBaseProvider>
       </View>
       {
-        assignmentCircle.map((item) => {
+       assignmentCircle.length > 0 ? ( assignmentCircle.map((item) => {
           return (
             <View style={styles.Cards} key={item.id}>
               <TouchableOpacity onPress={() => navigation.navigate('ASN00016',)}>
@@ -218,6 +224,9 @@ export default function Circle104({ navigation }) {
             </View>
           )
         })
+       ) : (
+        <ActivityIndicator size="large" style={{marginTop:200, alignSelf:'center'}} />
+       )
       }
       <Tab.Navigator
       >
@@ -232,6 +241,7 @@ export default function Circle104({ navigation }) {
         <Tab.Screen
           name='Published'
           component={Published}
+          initialParams={{ itemID: itemID, assignment_moodifiedID:assignment_moodifiedID}}
           options={{
             tabBarLabelStyle: { fontSize: 14, fontWeight: '500', color: 'green' }
           }}

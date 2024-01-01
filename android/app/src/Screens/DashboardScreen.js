@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, BackHandler,ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Box, Heading, Menu, AspectRatio, Center, HStack, Stack, NativeBaseProvider, Pressable } from "native-base";
 import FeatherIcon from 'react-native-vector-icons/Feather';
@@ -174,7 +174,7 @@ const LogoutHandling = async () => {
             </View>
           </NativeBaseProvider>
         </View>
-        {DashboardData.map((item) => (
+        {DashboardData.length > 0 ?  ( DashboardData.map((item) => (
           <View style={styles.cardContainer} key={item.id}>
             <TouchableOpacity
               onPress={() => {
@@ -212,7 +212,8 @@ const LogoutHandling = async () => {
               </View>
             </View>
           </View>
-        ))}
+        ))): <ActivityIndicator size="large" style={{marginTop:250, alignSelf:'center'}} />
+      } 
       </ScrollView>
 
     </>

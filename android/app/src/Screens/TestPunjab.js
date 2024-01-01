@@ -49,11 +49,11 @@ export default function TestPunjab({ navigation }) {
   const totalOutlet = route.params?.TotalOutlet;
   const OutletsCompleted = route.params?.OutletCompleted;
   const OutletsTerminated = route.params?.outletTerminated
-  console.log(OutletsCompleted)
-  console.log(totalOutlet);
-  console.log(totalAssignment);
-  console.log(Pid);
-  console.log(Itemid);
+  console.log('outlet completed',OutletsCompleted)
+  console.log('total outlet',totalOutlet);
+  console.log('total assignment id',totalAssignment);
+  console.log('project id',Pid);
+  console.log('task id',Itemid);
   const AssignmentapiURL = `https://coralr.com/api/assignments?task_id=${Itemid}`
   const AssignmentHandling = async () => {
     try {
@@ -206,12 +206,13 @@ export default function TestPunjab({ navigation }) {
       </View>
       <Tab.Navigator>
       <Tab.Screen
-        name='InProgress'
-        component={Inprogress}
+        name='Inprogress'
         options={{
-          tabBarLabelStyle: { fontSize: 12, color: '#FFA500' },
+          tabBarLabelStyle: { fontSize: 12, color:'#FFA500' },
         }}
-      />
+      >
+        {()=> <Inprogress AssignmentData={AssignmentData} navigation={navigation} Itemid={Itemid}  />}
+        </Tab.Screen>
       <Tab.Screen
         name='NotStarted'
         options={{
@@ -226,7 +227,7 @@ export default function TestPunjab({ navigation }) {
           tabBarLabelStyle: { fontSize: 12, color: 'green' },
         }}
       >
-        {()=> <Completed AssignmentData={AssignmentData} navigation={navigation} />}
+        {()=> <Completed AssignmentData={AssignmentData} navigation={navigation} Itemid={Itemid}  />}
         </Tab.Screen>
     </Tab.Navigator>
     </>

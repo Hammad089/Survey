@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, Button , ScrollView} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Button , ScrollView,ActivityIndicator} from 'react-native';
 import React, { useState } from 'react';
 
-export default function Completed({AssignmentData,navigation}) {
+export default function Completed({AssignmentData,navigation,Itemid}) {
   const ongoingAssignment = AssignmentData.filter((assignment)=>assignment.status === 'Complete')
   return (
     <>
@@ -10,7 +10,7 @@ export default function Completed({AssignmentData,navigation}) {
       ongoingAssignment.length > 0 ? ( ongoingAssignment.map((item, index)=> {
           return (
             <View style={styles.CardsContainer} key={item.assignment_id}>
-        <TouchableOpacity onPress={() => navigation.navigate(item.assignment_id)}>
+        <TouchableOpacity onPress={()=>{}}>
         <View style={{flexDirection:'row', columnGap:10, borderBottomWidth:0.5, borderColor:'lightgrey'}}>
             <View style={styles.circle}></View>
             <View>
@@ -52,11 +52,15 @@ export default function Completed({AssignmentData,navigation}) {
       </View>
           )
         })
-      ) : (
-        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-        <Text style={{fontSize:30}}>No Data Found</Text>
-      </View>
-      )
+      ) : (              
+        !ongoingAssignment.length > 0 ? (
+          <View style={{flex:1,justifyContent:'center',alignItems:'center', marginTop:150}}>
+          <Text style={{fontSize:20}}>No data found </Text>
+         </View>
+        ) : (
+          <ActivityIndicator size="large" style={{marginTop:150, alignSelf:'center'}} />
+        )
+  )
       }
       </ScrollView>
       </>
@@ -120,6 +124,6 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 100 / 2,
-    backgroundColor: 'darkred',
+    backgroundColor: 'green',
   },
 });
